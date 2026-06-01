@@ -7,6 +7,7 @@ import {
 import { Printer, FileText, Calendar, Loader2, Info, BookOpen } from 'lucide-react';
 import { TooltipProvider, Tooltip as UiTooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { endpoints, type Filters } from '@/lib/api';
+import { getDataAnchor } from '@/lib/dateRanges';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,6 +34,7 @@ export default function Report() {
   const enabled = applied !== null;
 
   const meta = useQuery({ queryKey: ['meta-report'], queryFn: () => endpoints.meta() });
+  const dataAnchor = getDataAnchor(meta.data);
   const kpis = useQuery({ queryKey: ['rep-kpis', filters], queryFn: () => endpoints.kpis(filters), enabled });
   const headlines = useQuery({ queryKey: ['rep-headlines', filters], queryFn: () => endpoints.headlines(filters), enabled });
   const trend = useQuery({ queryKey: ['rep-trend', filters], queryFn: () => endpoints.trend(filters), enabled });
@@ -119,6 +121,7 @@ export default function Report() {
             <div>
               <div className="text-xs text-muted-foreground mb-2">Quick ranges</div>
               <QuickRanges
+                dataAnchor={dataAnchor}
                 active={{ from: draft.from, to: draft.to }}
                 onPick={(v) => setDraft({ from: v.from, to: v.to })}
               />

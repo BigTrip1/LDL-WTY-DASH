@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Activity, ShieldCheck, ShieldX, Sparkles, Skull, Hourglass, Wrench, Truck, Loader2 } from 'lucide-react';
@@ -23,6 +23,7 @@ const DataQualityTab = lazy(() => import('./tabs/DataQualityTab'));
 const OperationsTab = lazy(() => import('./tabs/OperationsTab'));
 const PeoplePlacesTab = lazy(() => import('./tabs/PeoplePlacesTab'));
 const ReportTab = lazy(() => import('./tabs/ReportTab'));
+import { getDataAnchor, ytdRange } from '@/lib/dateRanges';
 import { fmtInt, fmtPct, rangeLabel } from '@/lib/utils';
 
 function TabLoading() {
@@ -39,6 +40,7 @@ type TabId = (typeof TAB_IDS)[number];
 export default function Dashboard() {
   const [filters, setFilters] = useUrlFilters();
   const [sp, setSp] = useSearchParams();
+  const defaultDatesApplied = useRef(false);
   const urlTab = sp.get('tab') as TabId | null;
   const activeTab: TabId = urlTab && TAB_IDS.includes(urlTab) ? urlTab : 'overview';
   const setActiveTab = (next: string) => {
@@ -47,8 +49,19 @@ export default function Dashboard() {
     setSp(u, { replace: true });
   };
 
-  const kpis = useQuery({ queryKey: ['kpis', filters], queryFn: () => endpoints.kpis(filters) });
   const meta = useQuery({ queryKey: ['meta'], queryFn: () => endpoints.meta() });
+  const dataAnchor = getDataAnchor(meta.data);
+
+  // Default landing view: YTD through latest vetted claim (not wall-clock today).
+  useEffect(() => {
+    if (!meta.data || defaultDatesApplied.current) return;
+    defaultDatesApplied.current = true;
+    if (sp.get('from') || sp.get('to') || sp.get('regime')) return;
+    const { from, to } = ytdRange(dataAnchor);
+    setFilters({ from, to });
+  }, [meta.data, dataAnchor, sp, setFilters]);
+
+  const kpis = useQuery({ queryKey: ['kpis', filters], queryFn: () => endpoints.kpis(filters) });
   const k = kpis.data || {} as any;
   const range = rangeLabel(filters, meta.data);
 
@@ -167,7 +180,7 @@ export default function Dashboard() {
         </div>
       </section>
 
-      <TopBar filters={filters} onChange={setFilters} />
+      <TopBar filters={filters} onChange={setFilters} dataAnchor={dataAnchor} />
       <FilterBar filters={filters} onChange={setFilters} />
 
       <section className="mx-auto max-w-[1600px] px-6 py-5">

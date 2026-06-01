@@ -8,9 +8,11 @@ import FilterPresets from './FilterPresets';
 interface Props {
   filters: Filters;
   onChange: (f: Filters) => void;
+  /** Latest claim date in Mongo — quick ranges (especially YTD) anchor here. */
+  dataAnchor: Date;
 }
 
-export default function TopBar({ filters, onChange }: Props) {
+export default function TopBar({ filters, onChange, dataAnchor }: Props) {
   const update = (patch: Partial<Filters>) => onChange({ ...filters, ...patch });
   return (
     <div className="sticky top-[57px] z-30 bg-black/90 backdrop-blur border-b border-jcb-border">
@@ -25,8 +27,9 @@ export default function TopBar({ filters, onChange }: Props) {
         </div>
         <div className="h-5 w-px bg-jcb-border" />
         <QuickRanges
+          dataAnchor={dataAnchor}
           active={{ from: filters.from, to: filters.to, regime: filters.regime }}
-          onPick={(v) => update(v)}
+          onPick={(v) => onChange({ ...filters, ...v })}
         />
         <div className="ml-auto flex items-center gap-2">
           <FilterPresets current={filters} onApply={onChange} />

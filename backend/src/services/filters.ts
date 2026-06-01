@@ -8,10 +8,21 @@ function arr(v: unknown): string[] | null {
   return s.includes(',') ? s.split(',').map(x => x.trim()).filter(Boolean) : [s];
 }
 
-function dateArg(v: unknown): Date | null {
+function dateArgStart(v: unknown): Date | null {
   if (!v) return null;
   const d = new Date(String(v));
-  return isNaN(d.getTime()) ? null : d;
+  if (isNaN(d.getTime())) return null;
+  d.setUTCHours(0, 0, 0, 0);
+  return d;
+}
+
+/** Inclusive end-of-day UTC for `to` query params (YYYY-MM-DD). */
+function dateArgEnd(v: unknown): Date | null {
+  if (!v) return null;
+  const d = new Date(String(v));
+  if (isNaN(d.getTime())) return null;
+  d.setUTCHours(23, 59, 59, 999);
+  return d;
 }
 
 export function buildMatch(q: ParsedQs | Record<string, unknown>): Record<string, any> {
@@ -41,8 +52,8 @@ export function buildMatch(q: ParsedQs | Record<string, unknown>): Record<string
   const tags = arr((q as any).tags);
   if (tags && tags.length) match.descriptionTags = { $in: tags };
 
-  const from = dateArg((q as any).from);
-  const to = dateArg((q as any).to);
+  const from = dateArgStart((q as any).from);
+  const to = dateArgEnd((q as any).to);
   const dateField = String((q as any).dateField || 'vettedDate');
   if (from || to) {
     match[dateField] = {};
