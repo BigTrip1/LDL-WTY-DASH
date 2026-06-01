@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table';
 import RegimeLine from '@/components/charts/RegimeLine';
-import CohortPeriodLines from '@/components/charts/CohortPeriodLines';
+import { cohortPeriodLines } from '@/components/charts/CohortPeriodLines';
 import { RECHARTS_TOOLTIP_PROPS } from '@/components/charts/rechartsTooltip';
 import { chartMixedTooltip, formatCohortRateTooltip, TPERIOD_GROUP_FORMULA } from '@/lib/tPeriodGroups';
 import Sparkline from '@/components/charts/Sparkline';
@@ -348,7 +348,7 @@ export default function Report() {
             <Tooltip {...RECHARTS_TOOLTIP_PROPS} formatter={(v: any, n: any) => chartMixedTooltip(v, n)} />
             <Legend wrapperStyle={{ fontSize: 11 }} />
             <Bar yAxisId="left" dataKey="n" name="Claims" fill={JCB.yellow} />
-            <CohortPeriodLines yAxisId="right" lineType="linear" />
+            {cohortPeriodLines({ yAxisId: 'right', lineType: 'linear' })}
           </ComposedChart>
         </ReportChart>
 
@@ -384,7 +384,7 @@ export default function Report() {
               formatter={(v: any, name: any) => formatCohortRateTooltip(v, name)}
             />
             <Legend wrapperStyle={{ fontSize: 11 }} />
-            <CohortPeriodLines />
+            {cohortPeriodLines()}
             <RegimeLine />
           </ComposedChart>
         </ReportChart>

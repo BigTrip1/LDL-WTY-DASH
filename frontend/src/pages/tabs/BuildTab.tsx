@@ -4,7 +4,7 @@ import { ResponsiveContainer, ComposedChart, Line, Area, XAxis, YAxis, Tooltip, 
 import { endpoints, type Filters } from '@/lib/api';
 import ChartCard from '@/components/charts/ChartCard';
 import RegimeLine from '@/components/charts/RegimeLine';
-import CohortPeriodLines from '@/components/charts/CohortPeriodLines';
+import { cohortPeriodLines } from '@/components/charts/CohortPeriodLines';
 import { RECHARTS_TOOLTIP_PROPS } from '@/components/charts/rechartsTooltip';
 import { chartMixedTooltip, TPERIOD_GROUP_FORMULA } from '@/lib/tPeriodGroups';
 import { JCB, fmtInt, fmtPct, fmtMonth, cn, rangeLabel } from '@/lib/utils';
@@ -90,7 +90,7 @@ export default function BuildTab({ filters }: { filters: Filters; setFilters?: (
             />
             <Legend wrapperStyle={{ fontSize: 11 }} />
             <Area yAxisId="left" type="monotone" dataKey="n" name="Claims" stroke={JCB.yellow} fill={JCB.yellow} fillOpacity={0.2} />
-            <CohortPeriodLines yAxisId="right" />
+            {cohortPeriodLines({ yAxisId: 'right' })}
             <RegimeLine />
           </ComposedChart>
         </ResponsiveContainer>

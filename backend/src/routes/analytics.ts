@@ -38,9 +38,13 @@ async function aggregateMonthlyCohort(
   match: Record<string, unknown>,
   dateField: 'buildDate' | 'vettedDate'
 ) {
+  const existingDate =
+    match[dateField] && typeof match[dateField] === 'object' && !Array.isArray(match[dateField])
+      ? (match[dateField] as Record<string, unknown>)
+      : {};
   const dateMatch = {
     ...match,
-    [dateField]: { $ne: null }
+    [dateField]: { ...existingDate, $ne: null }
   };
   const dateExpr = dateField === 'buildDate' ? '$buildDate' : '$vettedDate';
   const rows = await Claim.aggregate([

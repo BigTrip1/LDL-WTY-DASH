@@ -11,7 +11,7 @@ import {
 import { endpoints, type Filters } from '@/lib/api';
 import ChartCard from '@/components/charts/ChartCard';
 import RegimeLine, { REGIME_DATE_MS } from '@/components/charts/RegimeLine';
-import CohortPeriodLines from '@/components/charts/CohortPeriodLines';
+import { cohortPeriodLines } from '@/components/charts/CohortPeriodLines';
 import { RECHARTS_TOOLTIP_PROPS } from '@/components/charts/rechartsTooltip';
 import { chartMixedTooltip, formatCohortRateTooltip, TPERIOD_GROUP_FORMULA } from '@/lib/tPeriodGroups';
 import Sparkline from '@/components/charts/Sparkline';
@@ -339,7 +339,7 @@ export default function OverviewTab({ filters, setFilters }: TabProps) {
               <Legend wrapperStyle={{ fontSize: 11 }} />
               <Bar yAxisId="left" dataKey="n" name="Claims" fill={JCB.yellow} cursor="pointer"
                 onClick={(d: any) => addFilter('model', d.model)} />
-              <CohortPeriodLines yAxisId="right" lineType="linear" />
+              {cohortPeriodLines({ yAxisId: 'right', lineType: 'linear' })}
             </ComposedChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -365,7 +365,7 @@ export default function OverviewTab({ filters, setFilters }: TabProps) {
                 formatter={(v: any, name: any) => formatCohortRateTooltip(v, name)}
               />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              <CohortPeriodLines />
+              {cohortPeriodLines()}
               <RegimeLine />
             </ComposedChart>
           </ResponsiveContainer>
