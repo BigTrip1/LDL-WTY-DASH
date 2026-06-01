@@ -52,14 +52,13 @@ export default function Dashboard() {
   const meta = useQuery({ queryKey: ['meta'], queryFn: () => endpoints.meta() });
   const dataAnchor = getDataAnchor(meta.data);
 
-  // Default landing view: YTD through latest vetted claim (not wall-clock today).
+  // Default landing view: calendar YTD (1 Jan current year → today).
   useEffect(() => {
-    if (!meta.data || defaultDatesApplied.current) return;
+    if (defaultDatesApplied.current) return;
     defaultDatesApplied.current = true;
     if (sp.get('from') || sp.get('to') || sp.get('regime')) return;
-    const { from, to } = ytdRange(dataAnchor);
-    setFilters({ from, to });
-  }, [meta.data, dataAnchor, sp, setFilters]);
+    setFilters(ytdRange(new Date()));
+  }, [sp, setFilters]);
 
   const kpis = useQuery({ queryKey: ['kpis', filters], queryFn: () => endpoints.kpis(filters) });
   const k = kpis.data || {} as any;

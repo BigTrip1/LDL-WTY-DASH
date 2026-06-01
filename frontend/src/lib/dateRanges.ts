@@ -13,9 +13,12 @@ export function getDataAnchor(meta?: { dateRange?: { maxVetted?: string | Date }
   return new Date();
 }
 
-/** Year-to-date through the anchor date (Jan 1 → anchor, same calendar year). */
-export function ytdRange(anchor: Date): { from: string; to: string } {
-  const end = anchor;
+/**
+ * Calendar year-to-date: 1 Jan of the current year → today (wall-clock).
+ * YTD always uses today, not the last claim date in the database.
+ */
+export function ytdRange(today: Date = new Date()): { from: string; to: string } {
+  const end = today;
   const start = new Date(Date.UTC(end.getUTCFullYear(), 0, 1));
   return { from: isoDateUTC(start), to: isoDateUTC(end) };
 }
@@ -41,7 +44,7 @@ export function resolveQuickRange(
     case '90d':
       return daysBeforeRange(anchor, 90);
     case 'ytd':
-      return ytdRange(anchor);
+      return ytdRange(new Date());
     case '2024':
       return { from: '2024-01-01', to: '2024-12-31' };
     case '2025':

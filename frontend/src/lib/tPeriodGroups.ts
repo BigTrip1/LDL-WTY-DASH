@@ -1,9 +1,10 @@
 /** Warranty-period buckets used on cohort trend charts (share of claims per month). */
+/** High-contrast palette on dark charts (DOA / T1 / T3 / T6 are easy to tell apart). */
 export const TPERIOD_GROUP_LINES = [
   { dataKey: 'doaRate', name: 'DOA', color: '#EF4444' },
-  { dataKey: 't1Rate', name: 'T1 (T000+T001)', color: '#FBBF24' },
-  { dataKey: 't3Rate', name: 'T3 (T002+T003)', color: '#FCB026' },
-  { dataKey: 't6Rate', name: 'T6 (T004–T006)', color: '#60A5FA' }
+  { dataKey: 't1Rate', name: 'T1 (T000+T001)', color: '#C084FC' },
+  { dataKey: 't3Rate', name: 'T3 (T002+T003)', color: '#22D3EE' },
+  { dataKey: 't6Rate', name: 'T6 (T004–T006)', color: '#4ADE80' }
 ] as const;
 
 export const TPERIOD_GROUP_FORMULA =

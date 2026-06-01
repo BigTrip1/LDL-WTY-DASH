@@ -8,7 +8,7 @@ import {
 
 interface Props {
   active: { from?: string; to?: string; regime?: string[] };
-  /** End of dataset (max vettedDate). Quick ranges are relative to this, not wall-clock today. */
+  /** End of dataset (max vettedDate). Used for Last 30d/90d; YTD always uses today. */
   dataAnchor: Date;
   onPick: (patch: { from?: string; to?: string; regime?: string[] }) => void;
 }
