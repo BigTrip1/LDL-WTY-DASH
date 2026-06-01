@@ -15,7 +15,7 @@ import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@
 import RegimeLine from '@/components/charts/RegimeLine';
 import CohortPeriodLines from '@/components/charts/CohortPeriodLines';
 import { RECHARTS_TOOLTIP_PROPS } from '@/components/charts/rechartsTooltip';
-import { formatCohortRateTooltip, TPERIOD_GROUP_FORMULA } from '@/lib/tPeriodGroups';
+import { chartMixedTooltip, formatCohortRateTooltip, TPERIOD_GROUP_FORMULA } from '@/lib/tPeriodGroups';
 import Sparkline from '@/components/charts/Sparkline';
 import Donut from '@/components/charts/Donut';
 import { JCB, OUTCOME_COLORS, fmtInt, fmtPct, fmtMonth, fmtDate } from '@/lib/utils';
@@ -339,16 +339,16 @@ export default function Report() {
           </ComposedChart>
         </ReportChart>
 
-        <ReportChart title="Model league + DOA rate">
+        <ReportChart title="Model league · DOA + T1 + T3 + T6">
           <ComposedChart data={(byModel.data || []).slice(0, 12)}>
             <CartesianGrid stroke="#1a1a1a" />
             <XAxis dataKey="model" interval={0} angle={-25} textAnchor="end" height={70} tick={{ fontSize: 9 }} />
             <YAxis yAxisId="left" />
             <YAxis yAxisId="right" orientation="right" domain={[0, 1]} tickFormatter={(v) => `${Math.round(v * 100)}%`} />
-            <Tooltip formatter={(v: any, n: any) => n === 'doaRate' ? fmtPct(v) : fmtInt(v)} />
+            <Tooltip {...RECHARTS_TOOLTIP_PROPS} formatter={(v: any, n: any) => chartMixedTooltip(v, n)} />
             <Legend wrapperStyle={{ fontSize: 11 }} />
             <Bar yAxisId="left" dataKey="n" name="Claims" fill={JCB.yellow} />
-            <Line yAxisId="right" type="monotone" dataKey="doaRate" name="DOA rate" stroke={JCB.red} dot={false} strokeWidth={2} />
+            <CohortPeriodLines yAxisId="right" lineType="linear" />
           </ComposedChart>
         </ReportChart>
 

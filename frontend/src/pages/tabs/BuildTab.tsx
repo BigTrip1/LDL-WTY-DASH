@@ -6,7 +6,7 @@ import ChartCard from '@/components/charts/ChartCard';
 import RegimeLine from '@/components/charts/RegimeLine';
 import CohortPeriodLines from '@/components/charts/CohortPeriodLines';
 import { RECHARTS_TOOLTIP_PROPS } from '@/components/charts/rechartsTooltip';
-import { formatCohortRateTooltip, TPERIOD_GROUP_FORMULA } from '@/lib/tPeriodGroups';
+import { chartMixedTooltip, TPERIOD_GROUP_FORMULA } from '@/lib/tPeriodGroups';
 import { JCB, fmtInt, fmtPct, fmtMonth, cn, rangeLabel } from '@/lib/utils';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table';
 
@@ -86,8 +86,7 @@ export default function BuildTab({ filters }: { filters: Filters; setFilters?: (
             <Tooltip
               {...RECHARTS_TOOLTIP_PROPS}
               labelFormatter={(v) => fmtMonth(new Date(v as number))}
-              formatter={(v: any, name: any) =>
-                (name === 'Claims' ? [fmtInt(v), String(name)] : formatCohortRateTooltip(v, name))}
+              formatter={(v: any, name: any) => chartMixedTooltip(v, name)}
             />
             <Legend wrapperStyle={{ fontSize: 11 }} />
             <Area yAxisId="left" type="monotone" dataKey="n" name="Claims" stroke={JCB.yellow} fill={JCB.yellow} fillOpacity={0.2} />

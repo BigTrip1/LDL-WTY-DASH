@@ -13,7 +13,7 @@ import ChartCard from '@/components/charts/ChartCard';
 import RegimeLine, { REGIME_DATE_MS } from '@/components/charts/RegimeLine';
 import CohortPeriodLines from '@/components/charts/CohortPeriodLines';
 import { RECHARTS_TOOLTIP_PROPS } from '@/components/charts/rechartsTooltip';
-import { formatCohortRateTooltip, TPERIOD_GROUP_FORMULA } from '@/lib/tPeriodGroups';
+import { chartMixedTooltip, formatCohortRateTooltip, TPERIOD_GROUP_FORMULA } from '@/lib/tPeriodGroups';
 import Sparkline from '@/components/charts/Sparkline';
 import Donut from '@/components/charts/Donut';
 import { Card, CardContent } from '@/components/ui/card';
@@ -318,9 +318,9 @@ export default function OverviewTab({ filters, setFilters }: TabProps) {
         </ChartCard>
 
         <ChartCard
-          title="Model league · claims + DOA rate"
-          info="Top 12 models by claim volume. Red line overlays DOA rate so high-volume + high-DOA models surface immediately."
-          formula="bars = count(*) GROUP BY machineModel; line = count(tPeriod=='DOA') / count(*)"
+          title="Model league · claims + T-period mix"
+          info="Top 12 machine families by volume. Lines show DOA, T1 (T000+T001), T3 (T002+T003), and T6 (T004–T006) as a share of each model's claims — same groups as Admin → Filter groups → tPeriod."
+          formula={`bars = count(*) GROUP BY machineModel; ${TPERIOD_GROUP_FORMULA}`}
           source="machineModel, tPeriod"
           rangeLabel={range}
           loading={byModel.isLoading}
@@ -332,11 +332,14 @@ export default function OverviewTab({ filters, setFilters }: TabProps) {
               <XAxis dataKey="model" angle={-25} textAnchor="end" interval={0} height={70} tick={{ fontSize: 9 }} />
               <YAxis yAxisId="left" />
               <YAxis yAxisId="right" orientation="right" tickFormatter={(v) => `${Math.round(v * 100)}%`} domain={[0, 1]} />
-              <Tooltip formatter={(v: any, n: any) => (n === 'doaRate' ? fmtPct(v) : fmtInt(v))} />
+              <Tooltip
+                {...RECHARTS_TOOLTIP_PROPS}
+                formatter={(v: any, n: any) => chartMixedTooltip(v, n)}
+              />
               <Legend wrapperStyle={{ fontSize: 11 }} />
               <Bar yAxisId="left" dataKey="n" name="Claims" fill={JCB.yellow} cursor="pointer"
                 onClick={(d: any) => addFilter('model', d.model)} />
-              <Line yAxisId="right" type="monotone" dataKey="doaRate" name="DOA rate" stroke={JCB.red} strokeWidth={2} dot={false} />
+              <CohortPeriodLines yAxisId="right" lineType="linear" />
             </ComposedChart>
           </ResponsiveContainer>
         </ChartCard>

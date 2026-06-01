@@ -16,6 +16,14 @@ const IS_T1 = { $cond: [{ $in: ['$tPeriod', ['T000', 'T001']] }, 1, 0] };
 const IS_T3 = { $cond: [{ $in: ['$tPeriod', ['T002', 'T003']] }, 1, 0] };
 const IS_T6 = { $cond: [{ $in: ['$tPeriod', ['T004', 'T005', 'T006']] }, 1, 0] };
 
+/** $group accumulators for DOA + T1/T3/T6 (matches Admin filter groups). */
+const T_PERIOD_GROUP_ACCUM = {
+  doa: { $sum: IS_DOA },
+  t1: { $sum: IS_T1 },
+  t3: { $sum: IS_T3 },
+  t6: { $sum: IS_T6 }
+};
+
 function cohortTPeriodRatesFields() {
   return {
     doaRate: { $cond: [{ $gt: ['$n', 0] }, { $divide: ['$doa', '$n'] }, 0] },
@@ -34,16 +42,14 @@ async function aggregateMonthlyCohort(
     ...match,
     [dateField]: { $ne: null }
   };
+  const dateExpr = dateField === 'buildDate' ? '$buildDate' : '$vettedDate';
   const rows = await Claim.aggregate([
     { $match: dateMatch },
     {
       $group: {
-        _id: { $dateTrunc: { date: `$${dateField}`, unit: 'month' } },
+        _id: { $dateTrunc: { date: dateExpr, unit: 'month' } },
         n: { $sum: 1 },
-        doa: { $sum: IS_DOA },
-        t1: { $sum: IS_T1 },
-        t3: { $sum: IS_T3 },
-        t6: { $sum: IS_T6 },
+        ...T_PERIOD_GROUP_ACCUM,
         reject: { $sum: IS_REJECT },
         accept: { $sum: IS_ACCEPT },
         vetted: { $sum: ACCEPT_DENOM }
@@ -134,15 +140,14 @@ router.get('/by-model', async (req, res) => {
     { $group: {
         _id: '$machineModel',
         n: { $sum: 1 },
-        doa: { $sum: IS_DOA },
+        ...T_PERIOD_GROUP_ACCUM,
         vetted: { $sum: ACCEPT_DENOM },
         accept: { $sum: IS_ACCEPT },
         reject: { $sum: IS_REJECT },
         zcode: { $sum: IS_ZCODE }
       } },
     { $addFields: {
-        doaRate: { $cond: [{ $gt: ['$n', 0] }, { $divide: ['$doa', '$n'] }, 0] },
-        acceptRate: { $cond: [{ $gt: ['$vetted', 0] }, { $divide: ['$accept', '$vetted'] }, 0] },
+        ...cohortTPeriodRatesFields(),
         rejectRate: { $cond: [{ $gt: ['$vetted', 0] }, { $divide: ['$reject', '$vetted'] }, 0] },
         zcodeRate: { $cond: [{ $gt: ['$vetted', 0] }, { $divide: ['$zcode', '$vetted'] }, 0] }
       } },
