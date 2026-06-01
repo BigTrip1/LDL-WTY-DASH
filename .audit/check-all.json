@@ -1,0 +1,348 @@
+[
+  {
+    "tab": "Overview",
+    "charts": [
+      {
+        "title": "Year-on-year claim volume",
+        "cardW": 1005,
+        "cardH": 346,
+        "contentW": 1005,
+        "contentH": 280,
+        "rcW": 965,
+        "rcH": 260,
+        "bars": 24,
+        "lines": 0,
+        "areas": 0,
+        "pies": 0,
+        "empty": false
+      },
+      {
+        "title": "Monthly claim volume with 3-month rolling average",
+        "cardW": 1516,
+        "cardH": 366,
+        "contentW": 1516,
+        "contentH": 300,
+        "rcW": 1476,
+        "rcH": 280,
+        "bars": 24,
+        "lines": 1,
+        "areas": 0,
+        "pies": 0,
+        "empty": false
+      },
+      {
+        "title": "Failure-area Pareto",
+        "cardW": 493,
+        "cardH": 366,
+        "contentW": 493,
+        "contentH": 300,
+        "rcW": 453,
+        "rcH": 280,
+        "bars": 15,
+        "lines": 1,
+        "areas": 0,
+        "pies": 0,
+        "empty": false
+      },
+      {
+        "title": "Model league · claims + DOA rate",
+        "cardW": 493,
+        "cardH": 366,
+        "contentW": 493,
+        "contentH": 300,
+        "rcW": 453,
+        "rcH": 280,
+        "bars": 12,
+        "lines": 1,
+        "areas": 0,
+        "pies": 0,
+        "empty": false
+      },
+      {
+        "title": "DOA rate by build cohort",
+        "cardW": 493,
+        "cardH": 366,
+        "contentW": 493,
+        "contentH": 300,
+        "rcW": 453,
+        "rcH": 280,
+        "bars": 0,
+        "lines": 0,
+        "areas": 1,
+        "pies": 0,
+        "empty": false
+      },
+      {
+        "title": "Top countries · claims + accept rate",
+        "cardW": 493,
+        "cardH": 502,
+        "contentW": 493,
+        "contentH": 420,
+        "rcW": 453,
+        "rcH": 400,
+        "bars": 12,
+        "lines": 0,
+        "areas": 0,
+        "pies": 0,
+        "empty": false
+      }
+    ]
+  },
+  {
+    "tab": "Build-date",
+    "charts": [
+      {
+        "title": "Build-cohort claim volume + DOA rate",
+        "cardW": 1516,
+        "cardH": 386,
+        "contentW": 1516,
+        "contentH": 320,
+        "rcW": 1476,
+        "rcH": 300,
+        "bars": 0,
+        "lines": 1,
+        "areas": 1,
+        "pies": 0,
+        "empty": false
+      }
+    ]
+  },
+  {
+    "tab": "Vetting",
+    "charts": [
+      {
+        "title": "Monthly outcome mix (vetted-date)",
+        "cardW": 1516,
+        "cardH": 426,
+        "contentW": 1516,
+        "contentH": 360,
+        "rcW": 1476,
+        "rcH": 340,
+        "bars": 138,
+        "lines": 0,
+        "areas": 0,
+        "pies": 0,
+        "empty": false
+      },
+      {
+        "title": "Per-vetter accept rate over time · 6 selected",
+        "cardW": 1516,
+        "cardH": 406,
+        "contentW": 1516,
+        "contentH": 340,
+        "rcW": 1476,
+        "rcH": 320,
+        "bars": 0,
+        "lines": 6,
+        "areas": 0,
+        "pies": 0,
+        "empty": false
+      }
+    ]
+  },
+  {
+    "tab": "Outcome",
+    "charts": [
+      {
+        "title": "Failure flow · Area → Failed part → Outcome",
+        "cardW": 1516,
+        "cardH": 566,
+        "contentW": 1516,
+        "contentH": 500,
+        "rcW": 1500,
+        "rcH": 484,
+        "bars": 0,
+        "lines": 0,
+        "areas": 0,
+        "pies": 0,
+        "empty": true
+      },
+      {
+        "title": "Outcome mix · top 15 area by volume",
+        "cardW": 1516,
+        "cardH": 408,
+        "contentW": 1516,
+        "contentH": 360,
+        "rcW": 1476,
+        "rcH": 340,
+        "bars": 55,
+        "lines": 0,
+        "areas": 0,
+        "pies": 0,
+        "empty": false
+      }
+    ]
+  },
+  {
+    "tab": "Description",
+    "charts": [
+      {
+        "title": "Tag frequency",
+        "cardW": 493,
+        "cardH": 426,
+        "contentW": 493,
+        "contentH": 360,
+        "rcW": 453,
+        "rcH": 340,
+        "bars": 20,
+        "lines": 0,
+        "areas": 0,
+        "pies": 0,
+        "empty": false
+      },
+      {
+        "title": "Tag trend (selected)",
+        "cardW": 1005,
+        "cardH": 502,
+        "contentW": 1005,
+        "contentH": 360,
+        "rcW": 965,
+        "rcH": 340,
+        "bars": 0,
+        "lines": 5,
+        "areas": 0,
+        "pies": 0,
+        "empty": false
+      }
+    ]
+  },
+  {
+    "tab": "Supply",
+    "charts": [
+      {
+        "title": "Supplier · outcome mix (top 15)",
+        "cardW": 1516,
+        "cardH": 469,
+        "contentW": 1516,
+        "contentH": 420,
+        "rcW": 1476,
+        "rcH": 400,
+        "bars": 68,
+        "lines": 0,
+        "areas": 0,
+        "pies": 0,
+        "empty": false
+      },
+      {
+        "title": "Top countries by claim volume",
+        "cardW": 1516,
+        "cardH": 529,
+        "contentW": 1516,
+        "contentH": 480,
+        "rcW": 1476,
+        "rcH": 460,
+        "bars": 20,
+        "lines": 0,
+        "areas": 0,
+        "pies": 0,
+        "empty": false
+      }
+    ]
+  },
+  {
+    "tab": "Reliability",
+    "charts": [
+      {
+        "title": "Hours-to-fail distribution",
+        "cardW": 749,
+        "cardH": 406,
+        "contentW": 749,
+        "contentH": 340,
+        "rcW": 709,
+        "rcH": 320,
+        "bars": 9,
+        "lines": 0,
+        "areas": 0,
+        "pies": 0,
+        "empty": false
+      },
+      {
+        "title": "tPeriod mix per model (top 15)",
+        "cardW": 749,
+        "cardH": 406,
+        "contentW": 749,
+        "contentH": 340,
+        "rcW": 709,
+        "rcH": 320,
+        "bars": 119,
+        "lines": 0,
+        "areas": 0,
+        "pies": 0,
+        "empty": false
+      }
+    ]
+  },
+  {
+    "tab": "Operations",
+    "charts": [
+      {
+        "title": "‘Cannot Detect’ share over time",
+        "cardW": 1516,
+        "cardH": 386,
+        "contentW": 1516,
+        "contentH": 320,
+        "rcW": 1476,
+        "rcH": 300,
+        "bars": 24,
+        "lines": 1,
+        "areas": 0,
+        "pies": 0,
+        "empty": false
+      },
+      {
+        "title": "Time to vet · monthly average",
+        "cardW": 1005,
+        "cardH": 366,
+        "contentW": 1005,
+        "contentH": 300,
+        "rcW": 965,
+        "rcH": 280,
+        "bars": 0,
+        "lines": 0,
+        "areas": 1,
+        "pies": 0,
+        "empty": false
+      },
+      {
+        "title": "Day-of-week vetting activity",
+        "cardW": 493,
+        "cardH": 326,
+        "contentW": 493,
+        "contentH": 260,
+        "rcW": 453,
+        "rcH": 240,
+        "bars": 7,
+        "lines": 0,
+        "areas": 0,
+        "pies": 0,
+        "empty": false
+      },
+      {
+        "title": "Month-of-year activity",
+        "cardW": 1005,
+        "cardH": 326,
+        "contentW": 1005,
+        "contentH": 260,
+        "rcW": 965,
+        "rcH": 240,
+        "bars": 12,
+        "lines": 0,
+        "areas": 0,
+        "pies": 0,
+        "empty": false
+      }
+    ]
+  },
+  {
+    "tab": "People",
+    "charts": []
+  },
+  {
+    "tab": "Data",
+    "charts": []
+  },
+  {
+    "tab": "Full",
+    "charts": []
+  }
+]

@@ -1,0 +1,5 @@
+2026/05/27-20:42:08.776 6d08 Creating DB C:\Users\Vince\OneDrive\Desktop\wty\.audit\profile-supply3\Default\EdgeCoupons/coupons_data.db since it was missing.
+2026/05/27-20:42:08.798 6d08 Reusing MANIFEST C:\Users\Vince\OneDrive\Desktop\wty\.audit\profile-supply3\Default\EdgeCoupons/coupons_data.db/MANIFEST-000001
+2026/05/27-20:42:11.647 40c4 Level-0 table #5: started
+2026/05/27-20:42:11.650 40c4 Level-0 table #5: 682644 bytes OK
+2026/05/27-20:42:11.652 40c4 Delete type=0 #3
