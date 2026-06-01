@@ -183,16 +183,10 @@ echo.
 echo  +-----------------------------------------------------------+
 echo  ^|  Production stack is up. 2 terminal windows opened:       ^|
 echo  ^|    - WTY :: MongoDB     ^(if not already a service^)        ^|
-echo  ^|    - WTY :: Server  (prod)                                ^|
-echo  ^|                                                           ^|
-echo  ^|  App      : http://localhost:4000/                        ^|
-echo  ^|  Report   : http://localhost:4000/report                  ^|
-echo  ^|  Manual   : http://localhost:4000/manual                  ^|
-echo  ^|  Admin    : http://localhost:4000/admin                   ^|
-echo  ^|                                                           ^|
-echo  ^|  Tip: re-run with  start-prod.bat --rebuild               ^|
-echo  ^|      to force a fresh build before launch.                ^|
-echo  ^|  To stop everything, run stop.bat                         ^|
+echo  ^|    - WTY :: Server  (prod)  ^(Local + Network URLs there^)  ^|
 echo  +-----------------------------------------------------------+
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\_print-access-urls.ps1" -Port 4000 -Label "Production dashboard" -PathList "ROOT,report,manual,admin"
+echo  Tip: re-run with  start-prod.bat --rebuild  to force a fresh build.
+echo  To stop everything, run stop.bat
 echo.
 pause

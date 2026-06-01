@@ -283,6 +283,7 @@ The batch files are idempotent: they check for `node_modules` and run `npm insta
    ```
    The backend (`src/index.ts`) auto-detects `frontend/dist/` next to it, mounts it under `express.static` with `Cache-Control: public, max-age=3600 + ETag`, and adds an **SPA fallback** so `/`, `/admin`, `/report` (and any other React Router route) all serve `index.html` — while `/api/*` continues to serve JSON.
 6. Poll `http://localhost:4000/api/health` until 200 → open browser at `http://localhost:4000/`.
+7. The launcher and **WTY :: Server (prod)** window both print **Local** and **Network** URLs (your LAN IPv4, e.g. `http://192.168.x.x:4000/`) so colleagues on the same network can open the dashboard. Production binds `0.0.0.0:4000` by default; set `HOST=127.0.0.1` in `backend/.env` to restrict to this PC only.
 
 ### Manually (no batch files)
 
@@ -303,10 +304,12 @@ cd backend && set NODE_ENV=production && node dist/index.js
 
 Expected production server logs:
 ```
-[wty] Mongo connected: mongodb://localhost:27017/wty
-[wty] API listening on http://localhost:4000
+[wty] Mongo connected: mongodb://127.0.0.1:27017/wty
+[wty] Listening on 0.0.0.0:4000  (mode: production)
 [wty] Serving frontend from <wty>\frontend\dist
-[wty] Open http://localhost:4000/ in your browser
+[wty] Dashboard
+  Local:   http://localhost:4000/
+  Network: http://192.168.x.x:4000/
 ```
 
 ### Verified production build

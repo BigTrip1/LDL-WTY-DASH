@@ -27,6 +27,11 @@ export default function ChartCard({
   title, description, info, formula, source, rangeLabel,
   loading, className, bodyClassName, right, children
 }: Props) {
+  const isScrollBody = bodyClassName?.includes('overflow');
+  const isFixedHeightChart =
+    !isScrollBody &&
+    (bodyClassName?.includes('h-[') || bodyClassName?.includes('min-h-['));
+
   return (
     <Card className={cn(className)}>
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2 gap-2">
@@ -71,7 +76,7 @@ export default function ChartCard({
           {right}
         </div>
       </CardHeader>
-      <CardContent className={cn('pt-0', bodyClassName)}>
+      <CardContent className={cn('pt-0', isFixedHeightChart && 'overflow-visible', bodyClassName)}>
         {/*
           NOTE: do not put `flex-1` on this CardContent. When ChartCard sits in a
           grid row where every peer is also a ChartCard (no intrinsic-height

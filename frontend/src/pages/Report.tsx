@@ -13,6 +13,9 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table';
 import RegimeLine from '@/components/charts/RegimeLine';
+import CohortPeriodLines from '@/components/charts/CohortPeriodLines';
+import { RECHARTS_TOOLTIP_PROPS } from '@/components/charts/rechartsTooltip';
+import { formatCohortRateTooltip, TPERIOD_GROUP_FORMULA } from '@/lib/tPeriodGroups';
 import Sparkline from '@/components/charts/Sparkline';
 import Donut from '@/components/charts/Donut';
 import { JCB, OUTCOME_COLORS, fmtInt, fmtPct, fmtMonth, fmtDate } from '@/lib/utils';
@@ -41,7 +44,7 @@ export default function Report() {
   const topParts = useQuery({ queryKey: ['rep-topparts', filters], queryFn: () => endpoints.topParts(filters, 25), enabled });
   const bySupp = useQuery({ queryKey: ['rep-bysupp', filters], queryFn: () => endpoints.bySupplier(filters, 20), enabled });
   const byCountry = useQuery({ queryKey: ['rep-bycountry', filters], queryFn: () => endpoints.byCountry(filters), enabled });
-  const cohort = useQuery({ queryKey: ['rep-cohort', filters], queryFn: () => endpoints.buildCohort(filters), enabled });
+  const claimCohort = useQuery({ queryKey: ['rep-claim-cohort', filters], queryFn: () => endpoints.claimCohort(filters), enabled });
   const score = useQuery({ queryKey: ['rep-score', filters], queryFn: () => endpoints.vetterScorecard(filters), enabled });
   const pdi = useQuery({ queryKey: ['rep-pdi', filters], queryFn: () => endpoints.pdiEscape(filters), enabled });
   const cd = useQuery({ queryKey: ['rep-cd', filters], queryFn: () => endpoints.cannotDetectTrend(filters), enabled });
@@ -58,7 +61,7 @@ export default function Report() {
 
   const allQueries = [
     kpis, headlines, trend, yoy, regime, monthly, byModel, byArea, topParts, bySupp,
-    byCountry, cohort, score, pdi, cd, asd, ttv, season, zd, recid, dealers, customers,
+    byCountry, claimCohort, score, pdi, cd, asd, ttv, season, zd, recid, dealers, customers,
     tags, bigrams, anom
   ];
   const loaded = allQueries.filter(q => q.isSuccess).length;
@@ -368,18 +371,22 @@ export default function Report() {
         </ReportTable>
       </Section>
 
-      {/* §6 Build cohort */}
-      <Section n={6} title="Build-date cohort" summary="DOA share of each machine-build month. Recent months inflate because tail T-periods haven't had time to materialise yet.">
-        <ReportChart title="DOA rate by build cohort">
-          <AreaChart data={(cohort.data || []).map((r: any) => ({ ...r, ts: +new Date(r.date) }))}>
+      {/* §6 Claim cohort */}
+      <Section n={6} title="Claim cohort (vetted month)" summary="Share of claims in each T-period group by month vetted: DOA; T1 (T000+T001); T3 (T002+T003); T6 (T004–T006). Build-month cohorts are on the Build-date tab.">
+        <ReportChart title="Claim cohort · DOA + T1 + T3 + T6">
+          <ComposedChart data={(claimCohort.data || []).map((r: any) => ({ ...r, ts: +new Date(r.date) }))}>
             <CartesianGrid stroke="#1a1a1a" />
             <XAxis dataKey="ts" type="number" domain={['dataMin', 'dataMax']} scale="time" tickFormatter={(v) => fmtMonth(new Date(v))} />
             <YAxis tickFormatter={(v) => `${Math.round(v * 100)}%`} domain={[0, 1]} />
-            <Tooltip labelFormatter={(v) => fmtMonth(new Date(v as number))} formatter={(v: any) => fmtPct(v)} />
+            <Tooltip
+              {...RECHARTS_TOOLTIP_PROPS}
+              labelFormatter={(v) => fmtMonth(new Date(v as number))}
+              formatter={(v: any, name: any) => formatCohortRateTooltip(v, name)}
+            />
             <Legend wrapperStyle={{ fontSize: 11 }} />
-            <Area type="monotone" dataKey="doaRate" name="DOA rate" stroke={JCB.red} fill={JCB.red} fillOpacity={0.15} strokeWidth={2} />
+            <CohortPeriodLines />
             <RegimeLine />
-          </AreaChart>
+          </ComposedChart>
         </ReportChart>
       </Section>
 
@@ -664,7 +671,7 @@ const REPORT_SECTIONS: Array<{ n: number; title: string }> = [
   { n: 3, title: 'Temporal trends' },
   { n: 4, title: 'Vetting regime impact' },
   { n: 5, title: 'Pareto & root-cause' },
-  { n: 6, title: 'Build-date cohort' },
+  { n: 6, title: 'Claim cohort' },
   { n: 7, title: 'Operations' },
   { n: 8, title: 'Vetter scorecard' },
   { n: 9, title: 'People & Places' },

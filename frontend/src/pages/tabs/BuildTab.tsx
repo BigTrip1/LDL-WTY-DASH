@@ -4,6 +4,9 @@ import { ResponsiveContainer, ComposedChart, Line, Area, XAxis, YAxis, Tooltip, 
 import { endpoints, type Filters } from '@/lib/api';
 import ChartCard from '@/components/charts/ChartCard';
 import RegimeLine from '@/components/charts/RegimeLine';
+import CohortPeriodLines from '@/components/charts/CohortPeriodLines';
+import { RECHARTS_TOOLTIP_PROPS } from '@/components/charts/rechartsTooltip';
+import { formatCohortRateTooltip, TPERIOD_GROUP_FORMULA } from '@/lib/tPeriodGroups';
 import { JCB, fmtInt, fmtPct, fmtMonth, cn, rangeLabel } from '@/lib/utils';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table';
 
@@ -58,10 +61,10 @@ export default function BuildTab({ filters }: { filters: Filters; setFilters?: (
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <ChartCard
-        title="Build-cohort claim volume + DOA rate"
-        description="Bars = claims raised against machines built that month. Line = DOA share. Reference line = Jan-2025 regime."
-        info="One row per month-of-build. Recent cohorts inflate DOA because tail T-periods (T001..T006) haven't had time to materialise yet — toggle 'Mature cohorts only' to hide them."
-        formula="bars = count(*); line = count(tPeriod=='DOA')/count(*)  GROUP BY month(buildDate)"
+        title="Build cohort · claim volume + T-period mix"
+        description="Bars = claims for machines built that month. Lines = DOA, T1, T3, T6 share of those claims."
+        info="One row per machine build month. Lines show warranty-period groups: DOA only; T1 = T000+T001; T3 = T002+T003; T6 = T004–T006. Recent build months look worse until tail periods mature — use the toggle."
+        formula={`bars = count(*) GROUP BY month(buildDate); ${TPERIOD_GROUP_FORMULA}`}
         source="buildDate, tPeriod"
         rangeLabel={range}
         loading={cohort.isLoading}
@@ -80,11 +83,15 @@ export default function BuildTab({ filters }: { filters: Filters; setFilters?: (
             <XAxis dataKey="ts" type="number" domain={['dataMin', 'dataMax']} scale="time" tickFormatter={(v) => fmtMonth(new Date(v))} />
             <YAxis yAxisId="left" />
             <YAxis yAxisId="right" orientation="right" tickFormatter={(v) => `${Math.round(v * 100)}%`} domain={[0, 1]} />
-            <Tooltip labelFormatter={(v) => fmtMonth(new Date(v as number))}
-                     formatter={(v: any, name: any) => (name === 'DOA rate' ? fmtPct(v) : fmtInt(v))} />
+            <Tooltip
+              {...RECHARTS_TOOLTIP_PROPS}
+              labelFormatter={(v) => fmtMonth(new Date(v as number))}
+              formatter={(v: any, name: any) =>
+                (name === 'Claims' ? [fmtInt(v), String(name)] : formatCohortRateTooltip(v, name))}
+            />
             <Legend wrapperStyle={{ fontSize: 11 }} />
             <Area yAxisId="left" type="monotone" dataKey="n" name="Claims" stroke={JCB.yellow} fill={JCB.yellow} fillOpacity={0.2} />
-            <Line yAxisId="right" type="monotone" dataKey="doaRate" name="DOA rate" stroke={JCB.red} strokeWidth={2} dot={false} />
+            <CohortPeriodLines yAxisId="right" />
             <RegimeLine />
           </ComposedChart>
         </ResponsiveContainer>

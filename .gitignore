@@ -6,3 +6,5 @@ dist/
 .DS_Store
 backend/uploads/
 frontend/.vite/
+mongo-data/
+.audit/

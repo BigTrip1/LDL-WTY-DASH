@@ -35,8 +35,8 @@ export default function KpiTile({
   label, value, format, hint, accent = 'yellow', icon, pulse, info, formula, range, source
 }: Props) {
   return (
-    <Card className="relative overflow-hidden group">
-      <div className={cn('absolute left-0 top-0 h-full w-1', accentBar[accent], pulse && 'animate-pulse')} />
+    <Card className="relative group">
+      <div className={cn('absolute left-0 top-0 h-full w-1 z-0', accentBar[accent], pulse && 'animate-pulse')} />
       <CardContent className="p-4 pl-5">
         <div className="flex items-center justify-between gap-1">
           <span className="text-[11px] uppercase tracking-widest text-muted-foreground truncate flex items-center gap-1">

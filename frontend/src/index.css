@@ -60,7 +60,14 @@
   background: #0b0b0b !important;
   border: 1px solid #262626 !important;
   border-radius: 8px !important;
+  z-index: 10000 !important;
 }
+.recharts-tooltip-wrapper {
+  z-index: 10000 !important;
+  pointer-events: none !important;
+}
+/* Let chart tooltips escape card bounds; scroll areas keep overflow-auto on CardContent. */
+.recharts-wrapper { overflow: visible !important; }
 .recharts-tooltip-label, .recharts-tooltip-item { color: #f5f5f5 !important; }
 .recharts-cartesian-axis-tick text { fill: #8a8a8a !important; font-size: 11px; }
 .recharts-cartesian-grid line { stroke: #1a1a1a !important; }

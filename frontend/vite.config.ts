@@ -9,6 +9,7 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    host: true, // expose Local + Network URLs (same as Vite default, explicit here)
     proxy: {
       '/api': {
         target: 'http://localhost:4000',

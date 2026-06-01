@@ -26,8 +26,9 @@ Primary user: production quality + supplier quality engineers chasing root cause
 
 ## Widget catalogue
 
-### Build-cohort claim volume + DOA rate
-- **Source**: `/api/analytics/build-cohort` -> `{date, n, doa, reject, accept, vetted, doaRate, acceptRate}`.
+### Build cohort · claim volume + T-period mix
+- **Source**: `/api/analytics/build-cohort` -> `{date, n, doa, t1, t3, t6, doaRate, t1Rate, t3Rate, t6Rate, acceptRate, ...}`.
+- **Lines**: DOA; T1 (T000+T001); T3 (T002+T003); T6 (T004–T006) as share of claims for machines built that month.
 - **Formula**: bars = `count(*) GROUP BY month(buildDate)`. Line = `count(tPeriod='DOA') / count(*)` per month.
 - **Reading**: bars show how many claims came from each build-month. Red line on the right axis is the DOA share of that cohort. A bar with both a high count AND high DOA% is the textbook "bad batch" signal.
 - **Mature cohorts toggle**: enabled by default. Filters out build months younger than 90 days because their T-period tail hasn't had time to materialise. With the toggle off, recent months show inflated DOA % (e.g. Aug 2025: 62 %, Sep 2025: 73 %).

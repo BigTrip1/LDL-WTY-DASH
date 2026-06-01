@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { networkInterfaces } from 'node:os';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { connectMongo } from './db.js';
@@ -25,6 +26,33 @@ const STARTED = new Date();
 const PORT = Number(process.env.PORT) || 4000;
 const MODE: 'production' | 'development' =
   process.env.NODE_ENV === 'production' ? 'production' : 'development';
+// Production serves LAN clients on the same port; dev API stays loopback-only.
+const HOST =
+  process.env.HOST ?? (MODE === 'production' ? '0.0.0.0' : '127.0.0.1');
+
+function lanIpv4Addresses(): string[] {
+  const out: string[] = [];
+  for (const iface of Object.values(networkInterfaces())) {
+    if (!iface) continue;
+    for (const cfg of iface) {
+      if (cfg.family === 'IPv4' && !cfg.internal) out.push(cfg.address);
+    }
+  }
+  return [...new Set(out)];
+}
+
+function printAccessUrls(basePath = '/'): void {
+  const path = basePath.startsWith('/') ? basePath : `/${basePath}`;
+  console.log(`  Local:   http://localhost:${PORT}${path}`);
+  const lan = lanIpv4Addresses();
+  if (lan.length === 0) {
+    console.log('  Network: (no LAN IPv4 — Wi-Fi/Ethernet may be disconnected)');
+    return;
+  }
+  for (const ip of lan) {
+    console.log(`  Network: http://${ip}:${PORT}${path}`);
+  }
+}
 
 // Resolve where the built frontend lives (if at all). Done up-front so
 // /api/health can report frontendDistServed without re-checking the disk.
@@ -87,13 +115,18 @@ if (FRONTEND_DIST) {
 }
 
 connectMongo().then(() => {
-  app.listen(PORT, () => {
-    console.log(`[wty] API listening on http://localhost:${PORT}  (mode: ${MODE})`);
+  app.listen(PORT, HOST, () => {
+    console.log(`[wty] Listening on ${HOST}:${PORT}  (mode: ${MODE})`);
     if (FRONTEND_DIST) {
       console.log(`[wty] Serving frontend from ${FRONTEND_DIST}`);
-      console.log(`[wty] Open http://localhost:${PORT}/ in your browser`);
+      console.log('[wty] Dashboard');
+      printAccessUrls('/');
+      console.log('[wty] Admin upload');
+      printAccessUrls('/admin');
     } else {
-      console.log(`[wty] No built frontend found. Run 'npm run build' in /frontend or use dev mode.`);
+      console.log('[wty] API only (no built frontend in frontend/dist)');
+      printAccessUrls('/api/health');
+      console.log(`[wty] Run 'npm run build' in /frontend or use start-dev.bat.`);
     }
   });
 }).catch((err) => {

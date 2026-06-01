@@ -101,8 +101,10 @@ Source: `/api/analytics/headlines`. Generated from hard-coded thresholds in [bac
 - **Reading**: high bar + high red line = priority. Click a bar to filter to that model.
 - **Drill-down**: bar click -> adds model to filter.
 
-### DOA rate by build cohort (area chart)
-- **Source**: `/api/analytics/build-cohort`.
+### Claim cohort · DOA + T1 + T3 + T6 (line chart)
+- **Source**: `/api/analytics/claim-cohort`.
+- **Grouping**: month of `vettedDate` (when the claim was vetted), not machine build month.
+- **Lines**: DOA only; T1 = T000+T001; T3 = T002+T003; T6 = T004+T005+T006 (each as % of that month's claims).
 - **Formula**: `count(tPeriod='DOA') / count(*) GROUP BY month(buildDate)`.
 - **Reading**: red area = DOA share per machine-build month. Recent months inflate (T-period tail hasn't materialised) - the Build-date tab has a "mature cohorts only" toggle to correct for this.
 - **Drill-down**: none.
@@ -132,7 +134,7 @@ Source: `/api/analytics/headlines`. Generated from hard-coded thresholds in [bac
 
 ## Common interpretations
 1. **Reject rate climbing while volume flat** = stricter vetting, not a quality drift. Confirm by checking the Vetting & regime tab's regime delta table.
-2. **DOA rate spike on a build cohort** = batch-quality incident. Cross-reference build-month with the Build-date heatmap.
+2. **T-period spike on a claim cohort month** = shift in when failures appear in warranty life. Cross-reference with the Build-date tab for batch-quality by build month.
 3. **Top movers shows Production +897** = a category was renamed; not a real spike. Cross-check Assembly Line which went to zero in the same window.
 4. **Most symptom sparklines climbing simultaneously** = either total claim volume is rising or recent vetting is tagging more aggressively. Compare against the monthly volume chart.
 5. **Top failed part has < 70 % accept rate** = supplier investigation; warranty team may already have a containment in progress.

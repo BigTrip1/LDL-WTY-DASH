@@ -12,6 +12,48 @@ const IS_ZCODE = { $cond: [{ $eq: ['$claimOutcome', 'Z Code'] }, 1, 0] };
 const IS_MOREINFO = { $cond: [{ $eq: ['$claimOutcome', 'More Info'] }, 1, 0] };
 const IS_RAISE = { $cond: [{ $eq: ['$claimOutcome', 'Raise on Supplier'] }, 1, 0] };
 const IS_DOA = { $cond: [{ $eq: ['$tPeriod', 'DOA'] }, 1, 0] };
+const IS_T1 = { $cond: [{ $in: ['$tPeriod', ['T000', 'T001']] }, 1, 0] };
+const IS_T3 = { $cond: [{ $in: ['$tPeriod', ['T002', 'T003']] }, 1, 0] };
+const IS_T6 = { $cond: [{ $in: ['$tPeriod', ['T004', 'T005', 'T006']] }, 1, 0] };
+
+function cohortTPeriodRatesFields() {
+  return {
+    doaRate: { $cond: [{ $gt: ['$n', 0] }, { $divide: ['$doa', '$n'] }, 0] },
+    t1Rate: { $cond: [{ $gt: ['$n', 0] }, { $divide: ['$t1', '$n'] }, 0] },
+    t3Rate: { $cond: [{ $gt: ['$n', 0] }, { $divide: ['$t3', '$n'] }, 0] },
+    t6Rate: { $cond: [{ $gt: ['$n', 0] }, { $divide: ['$t6', '$n'] }, 0] },
+    acceptRate: { $cond: [{ $gt: ['$vetted', 0] }, { $divide: ['$accept', '$vetted'] }, 0] }
+  };
+}
+
+async function aggregateMonthlyCohort(
+  match: Record<string, unknown>,
+  dateField: 'buildDate' | 'vettedDate'
+) {
+  const dateMatch = {
+    ...match,
+    [dateField]: { $ne: null }
+  };
+  const rows = await Claim.aggregate([
+    { $match: dateMatch },
+    {
+      $group: {
+        _id: { $dateTrunc: { date: `$${dateField}`, unit: 'month' } },
+        n: { $sum: 1 },
+        doa: { $sum: IS_DOA },
+        t1: { $sum: IS_T1 },
+        t3: { $sum: IS_T3 },
+        t6: { $sum: IS_T6 },
+        reject: { $sum: IS_REJECT },
+        accept: { $sum: IS_ACCEPT },
+        vetted: { $sum: ACCEPT_DENOM }
+      }
+    },
+    { $addFields: cohortTPeriodRatesFields() },
+    { $sort: { _id: 1 } }
+  ]);
+  return rows.map(r => ({ date: r._id, ...r, _id: undefined }));
+}
 
 router.get('/kpis', async (req, res) => {
   const match = buildMatch(req.query);
@@ -196,23 +238,12 @@ router.get('/by-country', async (req, res) => {
 
 router.get('/build-cohort', async (req, res) => {
   const match = buildMatch(req.query);
-  const rows = await Claim.aggregate([
-    { $match: { ...match, buildDate: { $ne: null } } },
-    { $group: {
-        _id: { $dateTrunc: { date: '$buildDate', unit: 'month' } },
-        n: { $sum: 1 },
-        doa: { $sum: IS_DOA },
-        reject: { $sum: IS_REJECT },
-        accept: { $sum: IS_ACCEPT },
-        vetted: { $sum: ACCEPT_DENOM }
-      } },
-    { $addFields: {
-        doaRate: { $cond: [{ $gt: ['$n', 0] }, { $divide: ['$doa', '$n'] }, 0] },
-        acceptRate: { $cond: [{ $gt: ['$vetted', 0] }, { $divide: ['$accept', '$vetted'] }, 0] }
-      } },
-    { $sort: { _id: 1 } }
-  ]);
-  res.json(rows.map(r => ({ date: r._id, ...r, _id: undefined })));
+  res.json(await aggregateMonthlyCohort(match, 'buildDate'));
+});
+
+router.get('/claim-cohort', async (req, res) => {
+  const match = buildMatch(req.query);
+  res.json(await aggregateMonthlyCohort(match, 'vettedDate'));
 });
 
 router.get('/build-area-heat', async (req, res) => {

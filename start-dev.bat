@@ -161,16 +161,12 @@ echo.
 echo  +-----------------------------------------------------------+
 echo  ^|  Dev stack is up. 3 terminal windows opened:              ^|
 echo  ^|    - WTY :: MongoDB   ^(if not already a service^)          ^|
-echo  ^|    - WTY :: Backend  (dev)                                ^|
-echo  ^|    - WTY :: Frontend (dev)                                ^|
-echo  ^|                                                           ^|
-echo  ^|  Dashboard : http://localhost:5173/                       ^|
-echo  ^|  Report    : http://localhost:5173/report                 ^|
-echo  ^|  Manual    : http://localhost:5173/manual                 ^|
-echo  ^|  Admin     : http://localhost:5173/admin                  ^|
-echo  ^|  API root  : http://localhost:4000/                       ^|
-echo  ^|                                                           ^|
-echo  ^|  To stop everything, run stop.bat                         ^|
+echo  ^|    - WTY :: Backend  (dev)  on :4000                      ^|
+echo  ^|    - WTY :: Frontend (dev)  Vite Local + Network URLs     ^|
 echo  +-----------------------------------------------------------+
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\_print-access-urls.ps1" -Port 5173 -Label "Dev dashboard (Vite)" -PathList "ROOT,report,manual,admin"
+echo  API (backend only, loopback):
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\_print-access-urls.ps1" -Port 4000 -Label "Dev API" -PathList "api/health"
+echo  To stop everything, run stop.bat
 echo.
 pause

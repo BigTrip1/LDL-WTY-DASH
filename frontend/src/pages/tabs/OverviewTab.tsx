@@ -11,6 +11,9 @@ import {
 import { endpoints, type Filters } from '@/lib/api';
 import ChartCard from '@/components/charts/ChartCard';
 import RegimeLine, { REGIME_DATE_MS } from '@/components/charts/RegimeLine';
+import CohortPeriodLines from '@/components/charts/CohortPeriodLines';
+import { RECHARTS_TOOLTIP_PROPS } from '@/components/charts/rechartsTooltip';
+import { formatCohortRateTooltip, TPERIOD_GROUP_FORMULA } from '@/lib/tPeriodGroups';
 import Sparkline from '@/components/charts/Sparkline';
 import Donut from '@/components/charts/Donut';
 import { Card, CardContent } from '@/components/ui/card';
@@ -36,7 +39,7 @@ export default function OverviewTab({ filters, setFilters }: TabProps) {
   const topParts = useQuery({ queryKey: ['top-parts', filters], queryFn: () => endpoints.topParts(filters, 15) });
   const byCountry = useQuery({ queryKey: ['by-country', filters], queryFn: () => endpoints.byCountry(filters) });
   const regime = useQuery({ queryKey: ['regime-impact', filters], queryFn: () => endpoints.regimeImpact(filters) });
-  const cohort = useQuery({ queryKey: ['build-cohort', filters], queryFn: () => endpoints.buildCohort(filters) });
+  const claimCohort = useQuery({ queryKey: ['claim-cohort', filters], queryFn: () => endpoints.claimCohort(filters) });
   const headlines = useQuery({ queryKey: ['headlines', filters], queryFn: () => endpoints.headlines(filters) });
   const activity = useQuery({ queryKey: ['recent-activity', filters], queryFn: () => endpoints.recentActivity(filters, 14) });
   const sparkTags = useQuery({ queryKey: ['tag-sparklines', filters], queryFn: () => endpoints.tagSparklines(filters, 8) });
@@ -287,7 +290,7 @@ export default function OverviewTab({ filters, setFilters }: TabProps) {
         </ChartCard>
       </div>
 
-      {/* ===== Row 5: Pareto + Model + DOA cohort ===== */}
+      {/* ===== Row 5: Pareto + Model + Claim cohort ===== */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <ChartCard
           title="Failure-area Pareto"
@@ -339,25 +342,29 @@ export default function OverviewTab({ filters, setFilters }: TabProps) {
         </ChartCard>
 
         <ChartCard
-          title="DOA rate by build cohort"
-          description="DOA % per machine-build month."
-          info="DOA share for every batch of machines built in a given month. Recent cohorts inflate because tail T-periods haven't materialised yet (see the Build-date tab for a mature-only toggle)."
-          formula="count(tPeriod=='DOA') / count(*)  GROUP BY month(buildDate)"
-          source="buildDate, tPeriod"
+          title="Claim cohort · DOA + T1 + T3 + T6"
+          description="T-period mix by claim month (vetted date)."
+          info="One row per month claims were vetted. Lines show share of claims in each warranty-period group: DOA; T1 (T000+T001); T3 (T002+T003); T6 (T004–T006). For build-month trends use the Build-date tab."
+          formula={`${TPERIOD_GROUP_FORMULA}  GROUP BY month(vettedDate)`}
+          source="vettedDate, tPeriod"
           rangeLabel={range}
-          loading={cohort.isLoading}
+          loading={claimCohort.isLoading}
           bodyClassName="h-[300px]"
         >
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={(cohort.data || []).map((r: any) => ({ ...r, ts: +new Date(r.date) }))}>
+            <ComposedChart data={(claimCohort.data || []).map((r: any) => ({ ...r, ts: +new Date(r.date) }))}>
               <CartesianGrid stroke="#1a1a1a" />
               <XAxis dataKey="ts" type="number" domain={['dataMin', 'dataMax']} scale="time" tickFormatter={(v) => fmtMonth(new Date(v))} />
               <YAxis tickFormatter={(v) => `${Math.round(v * 100)}%`} domain={[0, 1]} />
-              <Tooltip labelFormatter={(v) => fmtMonth(new Date(v as number))} formatter={(v: any) => fmtPct(v)} />
+              <Tooltip
+                {...RECHARTS_TOOLTIP_PROPS}
+                labelFormatter={(v) => fmtMonth(new Date(v as number))}
+                formatter={(v: any, name: any) => formatCohortRateTooltip(v, name)}
+              />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Area type="monotone" dataKey="doaRate" name="DOA rate" stroke={JCB.red} fill={JCB.red} fillOpacity={0.15} strokeWidth={2} />
+              <CohortPeriodLines />
               <RegimeLine />
-            </AreaChart>
+            </ComposedChart>
           </ResponsiveContainer>
         </ChartCard>
       </div>

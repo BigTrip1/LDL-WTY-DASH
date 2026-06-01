@@ -52,6 +52,7 @@ export const endpoints = {
   bySupplier: (f: Filters, limit = 20) => api(`/api/analytics/by-supplier${toQueryString({ ...f, limit })}`),
   byCountry: (f: Filters) => api(`/api/analytics/by-country${toQueryString(f)}`),
   buildCohort: (f: Filters) => api(`/api/analytics/build-cohort${toQueryString(f)}`),
+  claimCohort: (f: Filters) => api(`/api/analytics/claim-cohort${toQueryString(f)}`),
   buildAreaHeat: (f: Filters) => api(`/api/analytics/build-area-heat${toQueryString(f)}`),
   cohortDrill: (ym: string) => api(`/api/analytics/cohort-drill${toQueryString({ ym })}`),
   hours: (f: Filters) => api(`/api/analytics/hours-distribution${toQueryString(f)}`),

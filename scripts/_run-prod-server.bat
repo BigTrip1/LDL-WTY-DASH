@@ -30,6 +30,7 @@ echo  ^|             WTY :: PRODUCTION SERVER                 ^|
 echo  +======================================================+
 echo  ^|  NODE_ENV : production                               ^|
 echo  ^|  Port     : 4000  ^(API + built frontend SPA^)         ^|
+echo  ^|  Bind     : 0.0.0.0  ^(LAN clients can use Network URL^) ^|
 echo  ^|  Vite     : NOT running  ^(this is the prod build^)    ^|
 echo  ^|  cwd      : %CD%
 echo  ^|  bin      : node dist\index.js                       ^|
