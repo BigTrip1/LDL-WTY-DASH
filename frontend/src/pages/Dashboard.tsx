@@ -23,7 +23,7 @@ const DataQualityTab = lazy(() => import('./tabs/DataQualityTab'));
 const OperationsTab = lazy(() => import('./tabs/OperationsTab'));
 const PeoplePlacesTab = lazy(() => import('./tabs/PeoplePlacesTab'));
 const ReportTab = lazy(() => import('./tabs/ReportTab'));
-import { getDataAnchor, ytdRange } from '@/lib/dateRanges';
+import { getDataAnchor, landingDateFilters } from '@/lib/dateRanges';
 import { fmtInt, fmtPct, rangeLabel } from '@/lib/utils';
 
 function TabLoading() {
@@ -52,12 +52,16 @@ export default function Dashboard() {
   const meta = useQuery({ queryKey: ['meta'], queryFn: () => endpoints.meta() });
   const dataAnchor = getDataAnchor(meta.data);
 
-  // Default landing view: calendar YTD (1 Jan current year → today).
+  // Landing: current-calendar-year YTD (1 Jan → today). Rolls forward on new year / stale URLs.
   useEffect(() => {
     if (defaultDatesApplied.current) return;
     defaultDatesApplied.current = true;
-    if (sp.get('from') || sp.get('to') || sp.get('regime')) return;
-    setFilters(ytdRange(new Date()));
+    const landing = landingDateFilters({
+      from: sp.get('from'),
+      to: sp.get('to'),
+      regime: sp.get('regime')
+    });
+    if (landing) setFilters(landing);
   }, [sp, setFilters]);
 
   const kpis = useQuery({ queryKey: ['kpis', filters], queryFn: () => endpoints.kpis(filters) });

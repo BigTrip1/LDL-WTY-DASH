@@ -2,7 +2,9 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
   QUICK_RANGE_OPTIONS,
+  isCurrentCalendarYtd,
   resolveQuickRange,
+  ytdRange,
   type QuickRangeId
 } from '@/lib/dateRanges';
 
@@ -15,7 +17,9 @@ interface Props {
 
 export default function QuickRanges({ active, dataAnchor, onPick }: Props) {
   const matchId = (() => {
+    if (isCurrentCalendarYtd(active.from, active.to)) return 'ytd';
     for (const r of QUICK_RANGE_OPTIONS) {
+      if (r.id === 'ytd') continue;
       const v = resolveQuickRange(r.id, dataAnchor);
       if ((v.from || '') === (active.from || '') &&
           (v.to || '') === (active.to || '') &&
@@ -27,6 +31,11 @@ export default function QuickRanges({ active, dataAnchor, onPick }: Props) {
   })();
 
   const pick = (id: QuickRangeId) => {
+    if (id === 'ytd') {
+      const { from, to } = ytdRange(new Date());
+      onPick({ from, to, regime: undefined });
+      return;
+    }
     const v = resolveQuickRange(id, dataAnchor);
     if (v.regime) {
       onPick({ regime: v.regime, from: undefined, to: undefined });

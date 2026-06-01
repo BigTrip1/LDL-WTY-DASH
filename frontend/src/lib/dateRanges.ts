@@ -1,4 +1,12 @@
-/** ISO date (YYYY-MM-DD) in UTC — matches API query params. */
+/** ISO date (YYYY-MM-DD) in local timezone — matches what users expect in date inputs. */
+export function isoDateLocal(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+/** ISO date (YYYY-MM-DD) in UTC. */
 export function isoDateUTC(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
@@ -14,13 +22,57 @@ export function getDataAnchor(meta?: { dateRange?: { maxVetted?: string | Date }
 }
 
 /**
- * Calendar year-to-date: 1 Jan of the current year → today (wall-clock).
- * YTD always uses today, not the last claim date in the database.
+ * Calendar year-to-date for the machine's current year:
+ * 1 January → today (local date). Recomputed on every call so it rolls forward
+ * when the calendar year changes and `to` advances each day.
  */
 export function ytdRange(today: Date = new Date()): { from: string; to: string } {
-  const end = today;
-  const start = new Date(Date.UTC(end.getUTCFullYear(), 0, 1));
-  return { from: isoDateUTC(start), to: isoDateUTC(end) };
+  const y = today.getFullYear();
+  return { from: `${y}-01-01`, to: isoDateLocal(today) };
+}
+
+/** True when filters are YTD for the current calendar year (from is always 1 Jan). */
+export function isCurrentCalendarYtd(
+  from?: string,
+  to?: string,
+  today: Date = new Date()
+): boolean {
+  if (!from || !to) return false;
+  const y = today.getFullYear();
+  if (from !== `${y}-01-01`) return false;
+  if (!to.startsWith(`${y}-`)) return false;
+  return to <= isoDateLocal(today);
+}
+
+/**
+ * True when URL dates look like a previous year's YTD (Jan 1 → mid-year),
+ * not a deliberate full-year range (…-12-31).
+ */
+export function isStaleCalendarYtd(
+  from?: string,
+  to?: string,
+  today: Date = new Date()
+): boolean {
+  if (!from || !to) return false;
+  const m = /^(\d{4})-01-01$/.exec(from);
+  if (!m) return false;
+  const fromYear = Number(m[1]);
+  const currentYear = today.getFullYear();
+  if (fromYear >= currentYear) return false;
+  if (to === `${fromYear}-12-31`) return false;
+  return to.startsWith(`${fromYear}-`);
+}
+
+/** Default dashboard date window on first load. */
+export function landingDateFilters(
+  url: { from?: string | null; to?: string | null; regime?: string | null },
+  today: Date = new Date()
+): { from: string; to: string } | null {
+  if (url.regime) return null;
+  const currentYtd = ytdRange(today);
+  if (!url.from && !url.to) return currentYtd;
+  if (url.from && url.to && isStaleCalendarYtd(url.from, url.to, today)) return currentYtd;
+  return null;
 }
 
 export function daysBeforeRange(anchor: Date, days: number): { from: string; to: string } {
